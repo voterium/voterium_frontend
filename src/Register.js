@@ -11,7 +11,7 @@ function Register() {
   const handleRegister = async (event) => {
     event.preventDefault();
     try {
-      await authApi.post('/register', { email, password });
+      await authApi.post('/auth/register', { email, password });
       setMessage('Registration successful! Please log in.');
       window.location.href = '/login'; // Redirect to login page
     } catch (error) {

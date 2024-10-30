@@ -38,7 +38,7 @@ votingApi.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh_token');
-        const { data } = await authApi.post('/refresh', { refresh_token: refreshToken });
+        const { data } = await authApi.post('/auth/refresh', { refresh_token: refreshToken });
 
         // Save new tokens
         localStorage.setItem('access_token', data.access_token);
@@ -53,7 +53,7 @@ votingApi.interceptors.response.use(
         // Clear tokens
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login'; // Redirect to login page
+        window.location.href = '/auth/login'; // Redirect to login page
         return Promise.reject(err);
       }
     }

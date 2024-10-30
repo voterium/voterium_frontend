@@ -11,7 +11,7 @@ function Login() {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await authApi.post('/login', { email, password });
+      const response = await authApi.post('/auth/login', { email, password });
       // Save tokens to localStorage
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);

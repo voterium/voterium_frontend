@@ -15,8 +15,13 @@ function VoterPortal() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await votingApi.post('/vote', { choice });
-      setMessage(response.data);
+      const response = await votingApi.post('/voting/vote', { choice });
+      const voteId = response.data.vote_id;
+      setMessage(`
+        <p><strong>Your vote has been submitted.</strong></p>
+        <p><strong>Vote ID:</strong> <em>${voteId}</em> – please record it now as you will not have another chance to access it in Voterium.</p>
+        <p>You can verify that your vote was correctly recorded by finding your <strong>Vote ID</strong> in the <em>Public Vote Verification Ledger</em>.</p>
+      `);
     } catch (error) {
       setMessage('Failed to submit vote.');
     }
@@ -47,7 +52,9 @@ function VoterPortal() {
           Submit Vote
         </Button>
       </form>
-      {message && <Typography style={{ marginTop: '1em' }}>{message}</Typography>}
+      {message && (
+        <Typography style={{ marginTop: '1em' }} dangerouslySetInnerHTML={{ __html: message }} />
+      )}
     </>
   );
 }
