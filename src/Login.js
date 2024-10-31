@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import {
+  Avatar,
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Container,
+  CssBaseline,
+  Link,
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { authApi } from './api';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [message, setMessage] = useState('');
 
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
       const response = await authApi.post('/auth/login', { email, password });
-      // Save tokens to localStorage
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
       setMessage('Login successful!');
@@ -23,36 +31,69 @@ function Login() {
   };
 
   return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Login
-      </Typography>
-      <form onSubmit={handleLogin}>
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ marginBottom: '1em' }}
-        />
-        <TextField
-          label="Password"
-          variant="outlined"
-          type="password"
-          fullWidth
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: '1em' }}
-        />
-        <Button type="submit" variant="contained" color="primary">
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
           Login
-        </Button>
-      </form>
-      {message && <Typography style={{ marginTop: '1em' }}>{message}</Typography>}
-    </>
+        </Typography>
+        <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {message && (
+            <Typography color="error" align="center" sx={{ mt: 2 }}>
+              {message}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Login
+          </Button>
+          <Typography variant="body2" align="center">
+            Don't have an account?{' '}
+            <Link href="/register" variant="body2">
+              Register
+            </Link>
+          </Typography>
+        </Box>
+      </Box>
+    </Container>
   );
 }
 

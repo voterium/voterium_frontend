@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography } from '@mui/material';
+import {
+  Avatar,
+  Button,
+  TextField,
+  Typography,
+  Box,
+  Container,
+  CssBaseline,
+  Link,
+} from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { authApi } from './api';
 
 function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [message, setMessage] = useState('');
 
   const handleRegister = async (event) => {
@@ -20,36 +29,69 @@ function Register() {
   };
 
   return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Register
-      </Typography>
-      <form onSubmit={handleRegister}>
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ marginBottom: '1em' }}
-        />
-        <TextField
-          label="Password"
-          variant="outlined"
-          type="password"
-          fullWidth
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ marginBottom: '1em' }}
-        />
-        <Button type="submit" variant="contained" color="primary">
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
           Register
-        </Button>
-      </form>
-      {message && <Typography style={{ marginTop: '1em' }}>{message}</Typography>}
-    </>
+        </Typography>
+        <Box component="form" onSubmit={handleRegister} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {message && (
+            <Typography color="error" align="center" sx={{ mt: 2 }}>
+              {message}
+            </Typography>
+          )}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Register
+          </Button>
+          <Typography variant="body2" align="center">
+            Already have an account?{' '}
+            <Link href="/login" variant="body2">
+              Login
+            </Link>
+          </Typography>
+        </Box>
+      </Box>
+    </Container>
   );
 }
 
