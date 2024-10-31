@@ -49,11 +49,10 @@ votingApi.interceptors.response.use(
 
         return votingApi(originalRequest);
       } catch (err) {
-        // Handle refresh token failure (e.g., redirect to login)
-        // Clear tokens
+        // Handle refresh token failure
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/auth/login'; // Redirect to login page
+        window.location.href = '/login'; // Redirect to login page
         return Promise.reject(err);
       }
     }

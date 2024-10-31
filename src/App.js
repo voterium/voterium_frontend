@@ -37,6 +37,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('vote_config'); // Clear the stored config
     setIsLoggedIn(false);
     window.location.href = '/login'; // Redirect to login page
   };

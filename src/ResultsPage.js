@@ -1,29 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, CircularProgress, Box } from '@mui/material';
 import { votingApi } from './api';
 import { BarChart } from '@mui/x-charts/BarChart';
 
 function Results() {
   const [results, setResults] = useState([]);
+  const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
-  const fetchCalledRef = useRef(false);
 
   useEffect(() => {
-    if (fetchCalledRef.current) return;
-    fetchCalledRef.current = true;
-
+    // Fetch voting results
     const fetchResults = async () => {
       try {
         const response = await votingApi.get('/voting/results');
         setResults(response.data);
       } catch (error) {
         console.error('Failed to fetch results:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchResults();
+    // Fetch vote config
+    const fetchConfig = async () => {
+      try {
+        const response = await votingApi.get('/voting/config');
+        setConfig(response.data);
+      } catch (error) {
+        console.error('Failed to fetch config:', error);
+      }
+    };
+
+    Promise.all([fetchResults(), fetchConfig()]).then(() => {
+      setLoading(false);
+    });
   }, []);
 
   if (loading) {
@@ -34,24 +42,25 @@ function Results() {
     );
   }
 
-  // Prepare data for BarChart
-  const labels = results.map((result) => result.choice);
+  if (!results.length || !config) {
+    return (
+      <Typography variant="h6">
+        No results available at this time.
+      </Typography>
+    );
+  }
+
+  // Map results to labels and counts
+  const choiceMap = {};
+  config.choices.forEach((choice) => {
+    choiceMap[choice.key] = { label: choice.label, color: choice.color };
+  });
+
+  const labels = results.map((result) => choiceMap[result.choice]?.label || result.choice);
   const counts = results.map((result) => result.count);
 
-  
-  // // Generate colors for each bar
-  const colors = [
-    '#F94144',
-    '#90BE6D',
-    '#577590',
-    '#F8961E',
-    '#277DA1',
-    '#F9C74F',
-    '#43AA8B',
-    '#4D908E',
-    '#F9844A',
-    '#F3722C',
-  ];
+  // Generate colors for each bar based on the config
+  const colors = results.map((result) => choiceMap[result.choice]?.color || '#cccccc');
 
   // Limit the width of the chart based on the number of choices
   const chartWidth = Math.min(labels.length * 100, 600); // Adjust maximum width as needed
@@ -80,17 +89,15 @@ function Results() {
           ]}
           yAxis={[
             {
-              // label: 'Number of Votes',
               axisLine: true,
             },
           ]}
           series={[
             {
               data: counts,
+              // color: colors,
             },
           ]}
-          seriesColorBy="data"
-          // series={series}
           width={chartWidth}
           height={400}
           margin={{ top: 20, right: 0, bottom: 40, left: 0 }} // Adjust margins for better spacing

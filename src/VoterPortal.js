@@ -7,7 +7,7 @@ import {
   Typography,
   Paper,
   Box,
-  Grid2
+  Grid,
 } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
@@ -15,19 +15,39 @@ import { votingApi } from './api';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 function VoterPortal() {
-  const [choice, setChoice] = useState('Option 1');
+  const [choiceKey, setChoiceKey] = useState('');
   const [message, setMessage] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     setIsLoggedIn(!!accessToken);
+
+    if (accessToken) {
+      // Check if config is already stored
+      const storedConfig = localStorage.getItem('vote_config');
+      if (storedConfig) {
+        setConfig(JSON.parse(storedConfig));
+      } else {
+        // Fetch the config lazily
+        votingApi
+          .get('/voting/config')
+          .then((response) => {
+            setConfig(response.data);
+            localStorage.setItem('vote_config', JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            console.error('Failed to fetch config:', error);
+          });
+      }
+    }
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await votingApi.post('/voting/vote', { choice });
+      const response = await votingApi.post('/voting/vote', { choice: choiceKey });
       const voteId = response.data.vote_id;
       setMessage(
         <>
@@ -56,59 +76,56 @@ function VoterPortal() {
     );
   }
 
+  if (!config) {
+    return (
+      <Typography variant="h6">
+        Loading voting options...
+      </Typography>
+    );
+  }
+
   return (
     <>
       <Typography variant="h4" gutterBottom>
         Voter Portal
       </Typography>
-      <Grid2 container spacing={4}>
+      <Grid container spacing={4}>
         {/* Voting Form */}
-        <Grid2 size={{ xs: 12, md: 6 }}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ padding: 3 }}>
             <form onSubmit={handleSubmit}>
               <Typography variant="h5" gutterBottom>
                 Cast Your Vote
               </Typography>
               <RadioGroup
-                value={choice}
-                onChange={(e) => setChoice(e.target.value)}
+                value={choiceKey}
+                onChange={(e) => setChoiceKey(e.target.value)}
               >
-                <FormControlLabel
-                  value="Option 1"
-                  control={<Radio />}
-                  label="Option 1"
-                />
-                <FormControlLabel
-                  value="Option 2"
-                  control={<Radio />}
-                  label="Option 2"
-                />
-                <FormControlLabel
-                  value="Option 3"
-                  control={<Radio />}
-                  label="Option 3"
-                />
-                <FormControlLabel
-                  value="Option 4"
-                  control={<Radio />}
-                  label="Option 4"
-                />
+                {config.choices.map((choice) => (
+                  <FormControlLabel
+                    key={choice.key}
+                    value={choice.key}
+                    control={<Radio />}
+                    label={choice.label}
+                  />
+                ))}
               </RadioGroup>
               <Button
                 type="submit"
                 variant="contained"
                 color="primary"
                 sx={{ mt: 2 }}
+                disabled={!choiceKey}
               >
                 Submit Vote
               </Button>
             </form>
             {message && <Box mt={2}>{message}</Box>}
           </Paper>
-        </Grid2>
+        </Grid>
 
         {/* Instructions */}
-        <Grid2 size={{ xs: 12, md: 6 }}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ padding: 3 }}>
             <Box display="flex" alignItems="center" mb={2}>
               <InfoOutlinedIcon color="primary" sx={{ mr: 1 }} />
@@ -116,19 +133,15 @@ function VoterPortal() {
             </Box>
             <Typography variant="body2" gutterBottom>
               <p>
-                <strong>
-                  You can recast your vote
-                </strong><
-                  br />
-                You can vote multiple times, but only your most recent vote
-                counts.
+                <strong>You can recast your vote</strong>
+                <br />
+                You can vote multiple times, but only your most recent vote counts.
               </p>
             </Typography>
             <Typography variant="body2" gutterBottom>
               <p>
-                <strong>
-                  Keep your Vote ID secure
-                </strong><br />
+                <strong>Keep your Vote ID secure</strong>
+                <br />
                 After submitting your vote, you will receive a unique Vote ID.
                 This is your receipt to verify your vote was counted. Please
                 record it securely, as it will not be displayed again or stored
@@ -148,13 +161,12 @@ function VoterPortal() {
               <p>
                 <strong>Secure and anonymous</strong>
                 <br />
-                No one can determine how you
-                voted (or if you voted) unless you share your Vote ID.
+                No one can determine how you voted (or if you voted) unless you share your Vote ID.
               </p>
             </Typography>
           </Paper>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </>
   );
 }
