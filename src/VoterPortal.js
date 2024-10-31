@@ -11,10 +11,6 @@ import {
 } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-
-
 import { votingApi } from './api';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
