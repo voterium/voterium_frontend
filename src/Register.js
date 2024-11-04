@@ -8,6 +8,7 @@ import {
   Container,
   CssBaseline,
   Link,
+  Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { authApi } from './api';
@@ -21,10 +22,10 @@ function Register() {
     event.preventDefault();
     try {
       await authApi.post('/auth/register', { email, password });
-      setMessage('Registration successful! Please log in.');
+      setMessage(<Alert severity="success">Registration successful! Please log in.</Alert>);
       window.location.href = '/login'; // Redirect to login page
     } catch (error) {
-      setMessage('Registration failed.');
+      setMessage(<Alert severity="error">Registration failed.</Alert>);
     }
   };
 
@@ -70,11 +71,7 @@ function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {message && (
-            <Typography color="error" align="center" sx={{ mt: 2 }}>
-              {message}
-            </Typography>
-          )}
+          {message && <Box mt={2}>{message}</Box>}
           <Button
             type="submit"
             fullWidth

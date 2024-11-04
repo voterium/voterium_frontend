@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Typography, CircularProgress, Box } from '@mui/material';
 import { votingApi } from './api';
 import { BarChart } from '@mui/x-charts/BarChart';
@@ -7,8 +7,12 @@ function Results() {
   const [results, setResults] = useState([]);
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const effectRan = useRef(false); // Added ref
 
   useEffect(() => {
+    if (effectRan.current) return; // Prevents the effect from running twice
+    effectRan.current = true;
+
     // Fetch voting results
     const fetchResults = async () => {
       try {

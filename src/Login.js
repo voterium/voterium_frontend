@@ -8,6 +8,8 @@ import {
   Container,
   CssBaseline,
   Link,
+  Alert,
+  Divider,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { authApi } from './api';
@@ -23,10 +25,10 @@ function Login() {
       const response = await authApi.post('/auth/login', { email, password });
       localStorage.setItem('access_token', response.data.access_token);
       localStorage.setItem('refresh_token', response.data.refresh_token);
-      setMessage('Login successful!');
+      setMessage(<Alert severity="success">Login successful!</Alert>);
       window.location.href = '/'; // Redirect to voting portal
     } catch (error) {
-      setMessage('Login failed.');
+      setMessage(<Alert severity="error">Login failed.</Alert>);
     }
   };
 
@@ -72,11 +74,7 @@ function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {message && (
-            <Typography color="error" align="center" sx={{ mt: 2 }}>
-              {message}
-            </Typography>
-          )}
+          {message && <Box mt={2}>{message}</Box>}
           <Button
             type="submit"
             fullWidth
