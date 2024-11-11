@@ -9,7 +9,6 @@ import {
   CssBaseline,
   Link,
   Alert,
-  Divider,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { authApi } from './api';
